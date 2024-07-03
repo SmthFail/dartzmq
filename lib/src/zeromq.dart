@@ -47,7 +47,10 @@ class ZContext {
   ///
   /// Note only one context should exist throughout your application
   /// and it should be closed if the app is disposed
-  ZContext() {
+  ZContext({Duration? duration}) {
+    if (duration != null) {
+      _timer = Timer.periodic(duration, (timer) => _poll());
+    }
     _context = _bindings.zmq_ctx_new();
     _poller = _bindings.zmq_poller_new();
     _startPolling();
