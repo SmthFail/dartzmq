@@ -30,6 +30,9 @@ class ZContext {
   /// Do we need to shutdown?
   bool _shutdown = false;
 
+  /// polling interval
+  late Duration pollingInterval = Duration(seconds: 1);
+
   /// Used for shutting down asynchronously
   Completer? _stopCompleter;
 
@@ -49,7 +52,8 @@ class ZContext {
   /// and it should be closed if the app is disposed
   ZContext({Duration? duration}) {
     if (duration != null) {
-      _timer = Timer.periodic(duration, (timer) => _poll());
+      pollingInterval = duration;
+      _timer = Timer.periodic(pollingInterval, (timer) => _poll());
     }
     _context = _bindings.zmq_ctx_new();
     _poller = _bindings.zmq_poller_new();
@@ -68,7 +72,7 @@ class ZContext {
   /// if there are actually listeners on sockets
   void _startPolling() {
     if (_timer == null && _listenedSockets.isNotEmpty) {
-      _timer = Timer.periodic(const Duration(seconds: 1), (timer) => _poll());
+      _timer = Timer.periodic(pollingInterval, (timer) => _poll());
     }
   }
 
